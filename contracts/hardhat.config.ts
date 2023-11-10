@@ -11,6 +11,7 @@ const config: HardhatUserConfig = {
       // the private key of signers, change it according to your ganache user
       accounts: [
         "0x14572a8cf5213770c0bfb997c34e959e07dac15d270c5099746fb48a364aafab",
+        "0x50208fd4277464f1b876c1355519b41b13fd4522252d5ee0dbd851b6d6e7dd36",
       ],
     },
   },
