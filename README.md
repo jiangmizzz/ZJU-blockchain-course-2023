@@ -37,13 +37,14 @@
     ```
 4. ...
 5. ...
+(因为本项目的前端使用了`yarn`包管理器，所以下面提供了`yarn`的相关指令)
 6. 在 `./frontend` 中安装需要的依赖，运行如下的命令：
     ```bash
-    npm install
+    yarn install
     ```
 7. 在 `./frontend` 中启动前端程序，运行如下的命令：
     ```bash
-    npm run start
+    yarn run dev
     ```
 
 ## 功能实现分析
