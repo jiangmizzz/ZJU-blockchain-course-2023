@@ -9,6 +9,7 @@ contract MyERC20 is ERC20 {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {
         _mint(msg.sender, 10000*10**decimals()); //发行10000积分给调用者
         balances[msg.sender] = 10000;
+        balances[0x4f5D7c08b843ec1b218eD38A56567e5Acd402573] = 10000;
     }
     //获取当前账户余额
     function getBalance(address account) external view returns(uint256){

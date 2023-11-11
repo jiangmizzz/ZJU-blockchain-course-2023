@@ -20,6 +20,7 @@ contract BorrowYourCar is ERC721 {
 
     // maybe you need a struct to store car information
     struct Car {
+        uint32 tokenId;
         address owner;
         address borrower;
         string returnDate;
@@ -28,7 +29,7 @@ contract BorrowYourCar is ERC721 {
 
     mapping(uint256 => Car) public cars; // A map from car index to its information
     MyERC20 public ERC20Contract;
-    uint256 public carCnt;
+    uint32 public carCnt;
     uint256[] priceArray = [100, 123, 250, 300, 40, 50]; //分配价格
 
     // ...
@@ -42,7 +43,13 @@ contract BorrowYourCar is ERC721 {
 
     //分发一个NFT
     function mintCarNFT(address account) external {
-        cars[carCnt] = Car(account, address(0), "---", priceArray[carCnt % 6]);
+        cars[carCnt] = Car(
+            carCnt,
+            account,
+            address(0),
+            "---",
+            priceArray[carCnt % 6]
+        );
         _mint(account, carCnt);
         carCnt++;
     }
@@ -118,15 +125,13 @@ contract BorrowYourCar is ERC721 {
     function borrowACar(
         uint256 carTokenId,
         string memory returnDate,
-        uint256 price
+        uint256 price,
+        address account
     ) external {
-        require(
-            ERC20Contract.balances(msg.sender) >= price * 100,
-            "No enough balance!"
-        );
+        require(ERC20Contract.balances(account) >= price, "No enough balance!");
         address owner = cars[carTokenId].owner;
-        ERC20Contract.transfer(msg.sender, owner, price * 100); //转钱到指定账户
-        cars[carTokenId].borrower = msg.sender;
+        ERC20Contract.transfer(account, owner, price); //转钱到指定账户
+        cars[carTokenId].borrower = account;
         cars[carTokenId].returnDate = returnDate;
     }
 

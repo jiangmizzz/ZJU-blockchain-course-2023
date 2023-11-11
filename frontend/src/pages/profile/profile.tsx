@@ -1,8 +1,14 @@
 import { Tabs } from "antd";
 import type { TabsProps } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CarCard from "../../components/CarCard";
 import "./profile.css";
+import { ReturnedCarItem } from "../index";
+import {
+  borrowYourCarContract,
+  myERC20Contract,
+  web3,
+} from "../../util/contracts";
 
 const items: TabsProps["items"] = [
   {
@@ -15,56 +21,58 @@ const items: TabsProps["items"] = [
   },
 ];
 
-const iniCars = [
-  {
-    tokenId: 0,
-    owner: "小明",
-    borrower: "小红",
-    returnDate: "2022-10-4",
-  },
-  {
-    tokenId: 1,
-    owner: "小hong",
-    borrower: "小ming",
-    returnDate: "2023-10-4",
-  },
-  // {
-  //   tokenId: 2,
-  //   owner: "redred",
-  //   borrower: "小m",
-  //   returnDate: "2023-10-5",
-  // },
-  // {
-  //   tokenId: 3,
-  //   owner: "MM",
-  //   borrower: "小ming",
-  //   returnDate: "2023-10-4",
-  // },
-];
-
 export default function Profile() {
-  const [carsList, setCarsList] = useState(iniCars);
+  const [carsList, setCarsList] = useState<ReturnedCarItem[]>([]);
+  const [account, setAccount] = useState<string>("");
+  const [carType, setCarType] = useState<string>("0");
 
-  async function handleTabChange(key: string) {
-    if (key == "1") {
-      //获取全部汽车
-    } else {
-      //可借汽车
-    }
-  }
+  useEffect(() => {
+    const getMyAccount = async () => {
+      const accounts = await web3.eth.getAccounts();
+      if (accounts && accounts.length) {
+        setAccount(accounts[0]);
+        setCarType("1");
+      }
+    };
+    getMyAccount();
+  }, []);
+  useEffect(() => {
+    const getCarList = async (key: string) => {
+      if (key == "1") {
+        //获取当前拥有的汽车
+        const Cars: ReturnedCarItem[] = await borrowYourCarContract.methods
+          // @ts-ignore
+          .getMyCars(account)
+          .call();
+        // console.log(Cars);
+        setCarsList(Cars);
+      } else {
+        //获取当前借的汽车
+        const Cars: ReturnedCarItem[] = await borrowYourCarContract.methods
+          // @ts-ignore
+          .getMyborrowedCars(account)
+          .call();
+        // console.log(Cars);
+        setCarsList(Cars);
+      }
+    };
+    getCarList(carType);
+  }, [carType]);
+
   return (
     <div>
-      <Tabs items={items} onChange={handleTabChange} />
+      <Tabs items={items} onChange={(key: string) => setCarType(key)} />
       <div className="carCard-grid">
-        {carsList.map(({ tokenId, owner, borrower, returnDate }, index) => {
+        {carsList.map(({ tokenId, owner, borrower, returnDate, price }) => {
           return (
             <>
               <CarCard
-                key={tokenId}
-                tokenId={tokenId}
+                key={Number(tokenId)}
+                tokenId={Number(tokenId)}
                 owner={owner}
                 borrower={borrower}
                 returnDate={returnDate}
+                price={Number(price)}
                 borrowable={false} //profile中的车均不能借
               />
             </>

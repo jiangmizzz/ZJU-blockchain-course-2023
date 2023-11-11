@@ -16,6 +16,7 @@ export interface carCardProps {
   borrower: string;
   returnDate: string;
   borrowable: boolean; //可否被当前用户借
+  price: number; //价格
   onBorrow?: () => void; //租借事件
 }
 export default function CarCard(props: carCardProps) {
@@ -37,8 +38,19 @@ export default function CarCard(props: carCardProps) {
         <Image src={picArray[props.tokenId % 8]} height={200} />
         <div>
           <p>Owner: {props.owner}</p>
-          <p>Borrower: {props.borrower == "" ? "未借出" : props.borrower}</p>
-          <p>returnDate: {props.borrower == "" ? "---" : props.returnDate}</p>
+          <p>
+            Borrower:{" "}
+            {props.borrower == "0x0000000000000000000000000000000000000000"
+              ? "未借出"
+              : props.borrower}
+          </p>
+          <p>
+            ReturnDate:{" "}
+            {props.borrower == "0x0000000000000000000000000000000000000000"
+              ? "---"
+              : props.returnDate}
+          </p>
+          <p>Price: {props.price} BB</p>
         </div>
       </Card>
     </>

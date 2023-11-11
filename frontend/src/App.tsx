@@ -17,7 +17,7 @@ import {
 } from "antd";
 import { MenuItemType } from "antd/es/menu/hooks/useItems";
 import { Link, Navigate, Route, Routes } from "react-router-dom";
-import { web3 } from "./util/contracts";
+import { borrowYourCarContract, myERC20Contract, web3 } from "./util/contracts";
 
 const { Header, Content, Footer, Sider } = Layout;
 const GanacheTestChainId = "0x539"; // Ganache默认的ChainId = 0x539 = Hex(1337)
@@ -50,6 +50,7 @@ const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [currentPage, selectCurrentPage] = useState<number>(0);
   const [account, setAccount] = useState<string>(""); //账户address
+  const [money, setMoney] = useState<number>(0); //账户余额
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -66,6 +67,12 @@ const App: React.FC = () => {
         const accounts = await web3.eth.getAccounts();
         if (accounts && accounts.length && accounts[0] != account) {
           setAccount(accounts[0]);
+          const Money: number = await myERC20Contract.methods
+            // @ts-ignore
+            .getBalance(accounts[0])
+            .call();
+          // console.log(Money);
+          setMoney(Number(Money));
         } else {
           messageApi.open({
             key: "1",
@@ -129,6 +136,23 @@ const App: React.FC = () => {
     }
   };
 
+  async function getACar() {
+    if (account == "") {
+      messageApi.open({
+        key: "1",
+        type: "error",
+        content: "你还未绑定钱包！",
+      });
+    } else {
+      //分发给当前账户一个NFT
+      await borrowYourCarContract.methods
+        // @ts-ignore
+        .mintCarNFT(account)
+        .send({ from: account });
+      window.location.reload(); //刷新页面
+    }
+  }
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {contextHolder}
@@ -162,15 +186,23 @@ const App: React.FC = () => {
               background: colorBgContainer,
             }}
           >
-            <Tag color="#2db7f5">Your Account:</Tag>
-            <span style={{ marginRight: "15px" }}> {account}</span>
-            <Button
-              type="primary"
-              disabled={account != ""}
-              onClick={onClickConnectWallet}
-            >
-              点击连接钱包
-            </Button>
+            <div style={{ width: "100%" }}>
+              <Tag color="#2db7f5">Your Account:</Tag>
+              <span> {account}</span>
+              <span style={{ marginLeft: "10px", marginRight: "15px" }}>
+                / 余额: {money} BB
+              </span>
+              <Button
+                type="primary"
+                disabled={account != ""}
+                onClick={onClickConnectWallet}
+              >
+                点击连接钱包
+              </Button>
+              <Button style={{ float: "right" }} onClick={getACar}>
+                获取一辆车
+              </Button>
+            </div>
             <Divider />
             <Routes>
               <Route path="/profile" element={<Profile />} />
