@@ -160,7 +160,7 @@
 </center>
 完成后会有弹窗提示借车成功：
 <br>
-<img src="images/img14.jpg" >
+<img src="images/img14.jpg" width=500>
 汽车列表和交易双方账户余额也随之发生变化（进行了租金的转账）：
 <img src="images/img15.jpg" >
 （这里第二个账户的初始余额忘记截图了，为 9900 BB，抱歉抱歉）
